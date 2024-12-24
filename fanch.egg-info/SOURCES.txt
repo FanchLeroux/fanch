@@ -1,0 +1,8 @@
+README.md
+requirements.txt
+setup.py
+fanch/tools.py
+fanch.egg-info/PKG-INFO
+fanch.egg-info/SOURCES.txt
+fanch.egg-info/dependency_links.txt
+fanch.egg-info/top_level.txt

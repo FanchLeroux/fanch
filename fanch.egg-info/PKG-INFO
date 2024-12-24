@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: fanch
+Version: 0.1
+Summary: custom set of functions
+Author: François Leroux
+Author-email: francois.leroux.pro@gmail.com
+Keywords: adaptive optics
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Programming Language :: Python
+Requires-Python: >=3.8.20
