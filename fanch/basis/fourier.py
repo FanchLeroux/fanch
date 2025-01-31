@@ -59,7 +59,8 @@ def compute_real_fourier_basis(n_px:int, *, return_map = False):
         return sort_real_fourier_basis(basis_map)
 
 def extract_subset(complete_real_fourier_basis, new_n_px):
-    return np.roll(complete_real_fourier_basis[:,:,np.arange(-new_n_px//2+1,new_n_px//2+1),0:new_n_px//2+1,:]
+    return np.roll(complete_real_fourier_basis
+                   [:,:,np.arange(-new_n_px//2+1,new_n_px//2+1),0:new_n_px//2+1,:]
                    , -new_n_px//2 + 1, axis = 2)
 
 def extract_horizontal_frequencies(basis_map):
