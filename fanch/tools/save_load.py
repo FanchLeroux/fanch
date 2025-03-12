@@ -9,6 +9,8 @@ idea from : https://stackoverflow.com/questions/6568007/how-do-i-save-and-restor
 import pickle
 import inspect
 
+import dill
+
 import pathlib
 
 from fanch.tools.miscellaneous import warning
@@ -22,7 +24,7 @@ def save_vars(filename, var_names):
     caller_vars = inspect.stack()[1].frame.f_locals
     saved_vars = {var_name: caller_vars[var_name] for var_name in var_names} # to skip missing ones, add `if var_name in caller_vars`
     with open(filename, 'wb') as f:
-        pickle.dump(saved_vars, f)
+        dill.dump(saved_vars, f)
 
 def load_vars(filename, var_names=False):
     '''
@@ -36,7 +38,7 @@ def load_vars(filename, var_names=False):
     
     caller_vars = inspect.stack()[1].frame.f_locals
     with open(filename, 'rb') as f:
-        saved_vars = pickle.load(f)
+        saved_vars = dill.load(f)
         
     if var_names:
         for var_name in var_names:
