@@ -1,6 +1,11 @@
 README.md
 requirements.txt
 setup.py
+fanch/focus_masks.py
+fanch/plots.py
+fanch/propagation.py
+fanch/pupil_masks.py
+fanch/pyramid.py
 fanch/tools.py
 fanch.egg-info/PKG-INFO
 fanch.egg-info/SOURCES.txt
