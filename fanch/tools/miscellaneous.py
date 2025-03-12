@@ -8,6 +8,9 @@ Created on Tue Dec 24 10:20:26 2024
 import matplotlib.pyplot as plt
 import numpy as np
 
+def warning(string):
+    print('\033[1;36m'+'Fanch Warning: \n' + string + '\033[0m')
+
 def get_circular_pupil(npx):
     D = npx + 1
     x = np.linspace(-npx/2,npx/2,npx)
