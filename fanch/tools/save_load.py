@@ -9,22 +9,35 @@ idea from : https://stackoverflow.com/questions/6568007/how-do-i-save-and-restor
 import pickle
 import inspect
 
+from copy import deepcopy
+
 import dill
 
 import pathlib
 
 from fanch.tools.miscellaneous import warning
 
-def save_vars(filename, var_names):
+def save_vars(filename, var_names=False):
     '''
     Save several variables to a pickle file
     such that their variable names can be recovered.
     Usage: `save_vars('variables.pkl', ['a', 'b'])`
     '''
-    caller_vars = inspect.stack()[1].frame.f_locals
-    saved_vars = {var_name: caller_vars[var_name] for var_name in var_names} # to skip missing ones, add `if var_name in caller_vars`
-    with open(filename, 'wb') as f:
-        dill.dump(saved_vars, f)
+
+    if var_names == False:
+        objs = deepcopy(locals())
+        for obj in objs:
+            if obj.startswith('_') or str(type(objs[obj])) == "<class 'module'>"\
+                or str(type(objs[obj])) == "<class 'function'>":
+                del locals()[obj]
+        del obj, objs
+        dill.dump_session(filename)
+
+    else:
+        caller_vars = inspect.stack()[1].frame.f_locals
+        saved_vars = {var_name: caller_vars[var_name] for var_name in var_names} # to skip missing ones, add `if var_name in caller_vars`
+        with open(filename, 'wb') as f:
+            dill.dump(saved_vars, f)
 
 def load_vars(filename, var_names=False):
     '''
