@@ -32,6 +32,7 @@ def save_vars(filename, var_names=False):
                 del locals()[obj]
         del obj, objs
         dill.dump_session(filename)
+        warning("As var_names was not provided, pkl file was generated with dill.dump_session method")
 
     else:
         caller_vars = inspect.stack()[1].frame.f_locals
@@ -39,7 +40,7 @@ def save_vars(filename, var_names=False):
         with open(filename, 'wb') as f:
             dill.dump(saved_vars, f)
 
-def load_vars(filename, var_names=False):
+def load_vars(filename, var_names=False, load_session=False):
     '''
     Load variables from a pickle file
     such that their variable names can be recovered,
@@ -49,16 +50,25 @@ def load_vars(filename, var_names=False):
     
     filename = pathlib.Path(filename)
     
-    caller_vars = inspect.stack()[1].frame.f_locals
-    with open(filename, 'rb') as f:
-        saved_vars = dill.load(f)
+    
         
     if var_names:
+        
+        caller_vars = inspect.stack()[1].frame.f_locals
+        with open(filename, 'rb') as f:
+            saved_vars = dill.load(f)
+        
         for var_name in var_names:
             if var_name in list(saved_vars.keys()):
                 caller_vars.update({var_name:saved_vars[var_name]})
             else:
                 warning(var_name+' not in '+str(filename.name))
+    
+    elif load_session:
+        dill.load_session(filename)
+    
     else:
-        caller_vars.update(saved_vars)
-        
+        caller_vars = inspect.stack()[1].frame.f_locals
+        with open(filename, 'rb') as f:
+            saved_vars = dill.load(f)
+            caller_vars.update(saved_vars)
