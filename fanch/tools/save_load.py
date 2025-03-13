@@ -24,7 +24,13 @@ def save_vars(filename, var_names=False):
     Usage: `save_vars('variables.pkl', ['a', 'b'])`
     '''
 
-    if var_names == False:
+    if var_names:
+        caller_vars = inspect.stack()[1].frame.f_locals
+        saved_vars = {var_name: caller_vars[var_name] for var_name in var_names} # to skip missing ones, add `if var_name in caller_vars`
+        with open(filename, 'wb') as f:
+            dill.dump(saved_vars, f)
+
+    else:
         objs = deepcopy(locals())
         for obj in objs:
             if obj.startswith('_') or str(type(objs[obj])) == "<class 'module'>"\
@@ -34,11 +40,6 @@ def save_vars(filename, var_names=False):
         dill.dump_session(filename)
         warning("As var_names was not provided, pkl file was generated with dill.dump_session method")
 
-    else:
-        caller_vars = inspect.stack()[1].frame.f_locals
-        saved_vars = {var_name: caller_vars[var_name] for var_name in var_names} # to skip missing ones, add `if var_name in caller_vars`
-        with open(filename, 'wb') as f:
-            dill.dump(saved_vars, f)
 
 def load_vars(filename, var_names=False, load_session=False):
     '''
@@ -49,9 +50,7 @@ def load_vars(filename, var_names=False, load_session=False):
     '''
     
     filename = pathlib.Path(filename)
-    
-    
-        
+            
     if var_names:
         
         caller_vars = inspect.stack()[1].frame.f_locals
