@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: fanch
 Version: 0.1
 Summary: custom set of functions
@@ -11,3 +11,9 @@ Classifier: Intended Audience :: Developers
 Classifier: Topic :: Scientific/Engineering :: Physics
 Classifier: Programming Language :: Python
 Requires-Python: >=3.8.20
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: keywords
+Dynamic: requires-python
+Dynamic: summary
