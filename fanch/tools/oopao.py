@@ -106,18 +106,22 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_ite
     
     if save_telemetry:
         dm_coefs = np.zeros([dm.nValidAct, n_iter])
-        pupil_opd = np.zeros(list(tel.OPD.shape).append(n_iter))
-        wfs_frames = np.zeros(list(pyramid.cam.frame.shape).append(n_iter))
+        turbulence_phase_screens = np.zeros([tel.OPD.shape[0],tel.OPD.shape[1]]+[n_iter])
+        wfs_frames = np.zeros([wfs.cam.frame.shape[0],wfs.cam.frame.shape[1]]+[n_iter])
         
     if save_psf:
-        short_exposure_psf = np.zeros(list(tel.PSF.shape).append(n_iter))
+        short_exposure_psf = np.zeros([tel.PSF.shape[0],tel.PSF.shape[1]] + [n_iter])
     
     # initialization
     
-    pupil_opd = np.zeros(list(tel.OPD.shape).append(delay))
+    pupil_opd = np.zeros([tel.OPD.shape[0],tel.OPD.shape[1]] + [delay])
     atm.initializeAtmosphere(tel)
     atm.generateNewPhaseScreen(seed = seed)
     tel+atm
+    
+    if save_telemetry:
+        turbulence_phase_screens[:,:,0] = tel.OPD
+    
     for n in range(1, delay):
         pupil_opd[:,:,n] = tel.OPD
         atm.update() # pupil_opd[:,:,delay] is the more recent turbulent phase screen
@@ -132,9 +136,13 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_ite
         
         # get total turbulence std
         atm.update() # this should reset tel.OPD
+        
+        if save_telemetry:
+            turbulence_phase_screens[:,:,0] = tel.OPD
+        
         total[k] = np.std(tel.OPD[np.where(tel.pupil==1)])*1e9 # after atm.update(), tel.OPD = turbulent phase screen.
         
-        # save current turulent phase sreen to be corrected after the delay
+        # save current turbulent phase sreen to be corrected after the delay
         np.roll(pupil_opd, -1, axis=0)
         pupil_opd[:,:,-1] = tel.OPD
         
@@ -143,7 +151,7 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_ite
         residual[k]=np.std(tel.OPD[np.where(tel.pupil==1)])*1e9 # [nm]
         strehl[k] = np.exp(-np.var(tel.src.phase[np.where(tel.pupil==1)]))
         
-        tel.OPD = pupil_OPD[0,:,:] # measuring the oldest OPD available
+        tel.OPD = pupil_opd[:,:,0] # measuring the oldest OPD available
         tel*dm*wfs
         wfs_measure = wfs.signal
         
@@ -153,8 +161,7 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_ite
         if save_telemetry:
             
             dm_coefs[:,k] = dm.coefs
-            pupil_opd[:,:,k] = tel.OPD
-            wfs_frames[:,:,k] = pyramid.cam.frame
+            wfs_frames[:,:,k] = wfs.cam.frame
             
         if save_psf:
             tel.computePSF()
