@@ -19,7 +19,11 @@ def clean_wfs(wfs):
     
     return wfs
 
-def close_the_loop(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter, delay=1, seed=0, save_telemetry=False):
+def close_the_loop(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter, 
+                   delay=1, seed=0, save_telemetry=False, save_psf=False):
+    
+    ngs*tel
+    tel.computePSF()
     
     # Memory allocation
     
@@ -32,11 +36,11 @@ def close_the_loop(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter, del
         dm_coefs = np.zeros([dm.nValidAct, n_iter])
         pupil_opd = np.zeros(list(tel.OPD.shape).append(n_iter))
         wfs_frames = np.zeros(list(pyramid.cam.frame.shape).append(n_iter))
+        
+    if save_psf:
+        short_exposure_psf = np.zeros(list(tel.PSF.shape).append(n_iter))
     
     # initialization
-    
-    ngs*tel
-    tel.computePSF()
 
     atm.initializeAtmosphere(tel)
     atm.generateNewPhaseScreen(seed = seed)
@@ -71,10 +75,22 @@ def close_the_loop(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter, del
             dm_coefs[:,k] = dm.coefs
             pupil_opd[:,:,k] = tel.OPD
             wfs_frames[:,:,k] = pyramid.cam.frame
+            
+        if save_psf:
+            tel.computePSF()
+            short_exposure_psf[:,:,k] = tel.PSF
     
-    if save_telemetry:
+    # return
+    
+    if save_telemetry and save_psf:
+        return total, residual, strehl, dm_coefs, pupil_opd, wfs_frames, short_exposure_psf
+    elif save_telemetry:
         return total, residual, strehl, dm_coefs, pupil_opd, wfs_frames
-    
+    elif save_psf:
+        total, residual, strehl, short_exposure_psf
     else:
         return total, residual, strehl
     
+def compute_mmse_reconstructor(calibratrion, modal_basis_covariance, noise_level, other_level):
+    
+    return 1
