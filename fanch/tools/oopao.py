@@ -139,31 +139,32 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain=0.5, n
         
         ngs*tel*dm*wfs
         
+        buffer_wfs_measure = np.roll(buffer_wfs_measure, -1, axis=1)
+        buffer_wfs_measure[:,-1] = wfs.signal
+
+        
         if save_telemetry:
             
             residual_phase_screens[:,:,k] = tel.OPD
             dm_coefs[:,k] = dm.coefs
             wfs_frames[:,:,k] = wfs.cam.frame
-       
+           
         residual[k]=np.std(tel.OPD[np.where(tel.pupil>0)])*1e9 # [nm]
         strehl[k] = np.exp(-np.var(tel.src.phase[np.where(tel.pupil>0)]))
-       
-        if save_psf:
            
+        dm.coefs = dm.coefs - loop_gain * np.matmul(reconstructor, buffer_wfs_measure[:,0])  
+           
+        if save_psf:
+            
             tel.computePSF()
             short_exposure_psf[:,:,k] = tel.PSF
-       
-        np.roll(buffer_wfs_measure, -1, axis=1)
-        buffer_wfs_measure[:,-1] = wfs.signal 
-       
-        dm.coefs = dm.coefs - loop_gain * np.matmul(reconstructor, buffer_wfs_measure[:,0])
        
        
     # return
     
     if save_telemetry and save_psf:
         return total, residual, strehl, dm_coefs, turbulence_phase_screens,\
-                      residual_phase_screens, wfs_frames, short_exposure_psf
+                      residual_phase_screens, wfs_frames, short_exposure_psf, buffer_wfs_measure
     elif save_telemetry:
         return total, residual, strehl, dm_coefs, turbulence_phase_screens,\
             residual_phase_screens, wfs_frames
