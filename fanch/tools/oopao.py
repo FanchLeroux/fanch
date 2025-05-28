@@ -92,8 +92,10 @@ def close_the_loop(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter,
         return total, residual, strehl
     
 
-def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain=0.5, n_iter=100, 
-                   delay=1, seed=0, save_telemetry=False, save_psf=False):
+def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain, n_iter=100, 
+                   delay=1, photon_noise = False, seed=0, save_telemetry=False, save_psf=False,):
+    
+    wfs.cam.photonNoise = photon_noise
     
     ngs*tel
     tel.computePSF() # just to get the shape
@@ -141,6 +143,7 @@ def close_the_loop_delay(tel, ngs, atm, dm, wfs, reconstructor, loop_gain=0.5, n
         
         buffer_wfs_measure = np.roll(buffer_wfs_measure, -1, axis=1)
         buffer_wfs_measure[:,-1] = wfs.signal
+        #buffer_wfs_measure[:,-1] = wfs.telescope.src.wavelength/(2. * np.pi) * wfs.signal
 
         
         if save_telemetry:
