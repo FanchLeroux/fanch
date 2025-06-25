@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import matplotlib.animation as animation
 
-def make_gif(data, path):
+def make_gif(path, data, interval=200, repeat_delay=1000):
 
     fig, ax = plt.subplots()
     
@@ -19,15 +19,16 @@ def make_gif(data, path):
     # each frame
     ims = []
     for i in range(data.shape[2]):
-        im = ax.imshow(data[:,:,i])
+        im = ax.imshow(data[:,:,i], vmax = data.max())
         if i == 0:
-            ax.imshow(data[:,:,i])
+            ax.imshow(data[:,:,i], vmax = data.max())
         ims.append([im])
+        
     
     # ax.set_title('2pi rad RMS')
     
-    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=True,
-                                    repeat_delay=1000)
+    ani = animation.ArtistAnimation(fig, ims, interval=interval, blit=True,
+                                    repeat_delay=repeat_delay)
 
 # To save the animation, use e.g.
 #
