@@ -28,7 +28,7 @@ def zeros_padding(array, zeros_padding_factor):
     return array
 
 def get_tilt(shape, theta=0., amplitude=1.):
-    [X,Y] = np.meshgrid(np.arange(0, shape[0]), np.arange(0, shape[1]))
+    [X,Y] = np.meshgrid(np.arange(0, shape[1]), np.arange(0, shape[0]))
     tilt_theta = np.cos(theta) * X + np.sin(theta) * Y
     Y = np.flip(Y, axis=0) # change orientation
     tilt_theta = (tilt_theta - tilt_theta.min())/(tilt_theta.max()- tilt_theta.min())
