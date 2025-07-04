@@ -31,26 +31,28 @@ def sort_real_fourier_basis(basis_map):
         basis[:,:,k] = np.array(my_list[k][1])
             
     return basis
-
+    
 def compute_real_fourier_basis(n_px:int, *, return_map = False, npx_computation_limit = False):
     
-    basis_map = np.empty((n_px, n_px, n_px, n_px//2+1, 2), dtype=float)
+    if npx_computation_limit:
+        n_px2 = npx_computation_limit
+    else:
+        n_px2 = n_px
+    
+    basis_map = np.empty((n_px, n_px, n_px2, n_px2//2+1, 2), dtype=float)
     basis_map.fill(np.nan)
     
     [X,Y] = np.meshgrid(np.arange(-n_px//2 + 1, n_px//2 + 1), np.flip(np.arange(-n_px//2 + 1, n_px//2 + 1)))
     
-    if npx_computation_limit:
-        n_px = npx_computation_limit
-    
-    for nu_x in np.arange(-n_px//2 + 1, n_px//2 + 1):
-        for nu_y in np.arange(0, n_px//2 + 1):
+    for nu_x in np.arange(-n_px2//2 + 1, n_px2//2 + 1):
+        for nu_y in np.arange(0, n_px2//2 + 1):
             
-            if (nu_x == 0 and nu_y == 0) or (nu_x == 0 and nu_y == n_px//2)\
-            or (nu_x == n_px//2 and nu_y == n_px//2) or (nu_x == n_px//2 and nu_y == 0):
+            if (nu_x == 0 and nu_y == 0) or (nu_x == 0 and nu_y == n_px2//2)\
+            or (nu_x == n_px2//2 and nu_y == n_px2//2) or (nu_x == n_px2//2 and nu_y == 0):
                 
                 basis_map[:,:,nu_x, nu_y, 0] = 1./X.shape[0] * np.cos(2.*np.pi/X.shape[0] * (nu_x * X + nu_y * Y))
                 
-            elif (nu_y != 0 or nu_x >= 0) and  (nu_y != n_px//2 or nu_x >= 0):
+            elif (nu_y != 0 or nu_x >= 0) and  (nu_y != n_px2//2 or nu_x >= 0):
                 
                 basis_map[:,:,nu_x, nu_y, 0] = 2**0.5/X.shape[0] * np.cos(2.*np.pi/X.shape[0] * (nu_x * X + nu_y * Y))
                 basis_map[:,:,nu_x, nu_y, 1] = 2**0.5/X.shape[0] * np.sin(2.*np.pi/X.shape[0] * (nu_x * X + nu_y * Y))
@@ -60,6 +62,9 @@ def compute_real_fourier_basis(n_px:int, *, return_map = False, npx_computation_
         return basis_map
     else:
         return sort_real_fourier_basis(basis_map)
+    
+    
+    
 
 def extract_subset(complete_real_fourier_basis, new_n_px):
     return np.roll(complete_real_fourier_basis
