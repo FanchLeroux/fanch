@@ -23,13 +23,9 @@ def make_gif(path, data, interval=200, repeat_delay=1000):
         if i == 0:
             ax.imshow(data[:,:,i], vmax = data.max())
         ims.append([im])
-        
-    
-    # ax.set_title('2pi rad RMS')
     
     ani = animation.ArtistAnimation(fig, ims, interval=interval, blit=True,
                                     repeat_delay=repeat_delay)
 
-# To save the animation, use e.g.
-#
+    # To save the animation, use e.g.
     ani.save(path)
